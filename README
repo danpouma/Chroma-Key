@@ -1,5 +1,3 @@
-This program is a rework of Mike Penta's bitmap_to_gray.c program.
-
 This program reads two bitmap files (assumes 24 bit, but with a minor change
 it can be used with 32 bit) and places the second bitmap wherever the first bitmap is green.
 
