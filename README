@@ -1,0 +1,20 @@
+This program is a rework of Mike Penta's bitmap_to_gray.c program.
+
+This program reads two bitmap files (assumes 24 bit, but with a minor change
+it can be used with 32 bit) and places the second bitmap wherever the first bitmap is green.
+
+file names for input and output are specified on the commandline at run time
+>>./a.out filein.bmp filein2.bmp fileout.bmp
+
+The bitmap structure represents the file data. This structure is comprised
+of a file header strutucture, a bitmap info header, a color table and padding,
+and lastly image data. the read_bitmap function will load a bitmap into these
+structures and return a bitmap structure.
+
+once a bitmap structure is constructed it can be write to a file using the
+write_bitmap function
+
+In this example program the bitmaps are loaded and verified. if no errors occur,
+then each pixel is examined. the r g and b values of each pixel in the first bitmap 
+are checked to see if they are green and if they are then they will be replaced 
+with the second bitmap
