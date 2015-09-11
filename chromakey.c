@@ -1,24 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//---------TYPEDEF-----------
-
 typedef struct bitmap BITMAP; 
-typedef struct header HEADER; //bitmap file header
-typedef struct info INFO; //bitmap image info header
-
+typedef struct header HEADER;
+typedef struct info INFO;
 
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
 
-//uncomment pixel_32 type def and comment pixel_24 to use 32 bit
 //typedef struct pixel_32 PIXEL; //Pixel if using 32 bit bmp
 typedef struct pixel_24 PIXEL; //pixel if using 24 bit bmp
-
-//-------END TYPEDEF---------
-
-//--------STRUCTURES--------
 
 struct bitmap
 {
@@ -29,7 +21,7 @@ struct bitmap
 };
 
 #pragma pack(push, 1)
-struct header //14 bytes - info aabout the file
+struct header //14 bytes - info about the file
 {
 	WORD signature; //BM for bitmap
 	DWORD file_size; //Size of the entire BMP file
@@ -75,14 +67,8 @@ struct pixel_32 //32 bit pixel
 };
 #pragma pack(pop)
 
-//-------END STRUCTURES-----
-
-//-------PROTOTYPES----
 BITMAP* read_bitmap(char* file);
 void write_bitmap(char* file, BITMAP* bitmap);
-
-//----END PROTOTYPES---
-
 
 int main(int argc, char** argv)
 {
@@ -100,13 +86,13 @@ int main(int argc, char** argv)
 		error = 1;
 	}
 	else
-	{ //get the file names from the command line
+	{ // Get the file names from the command line
 		in_file_name = argv[1];
 		in_file_name2 = argv[2];
 		out_file_name = argv[3];
 	}
 
-	//file names ok, validate bmp type
+	// Valid filename, validate bmp type
 	if(error == 0)
 	{
 		bmp=read_bitmap(in_file_name);
@@ -116,7 +102,7 @@ int main(int argc, char** argv)
 			puts("ERROR: Loading File");
 		}
 	}
-	//second file names ok, validate bmp type
+	// Second valid filename, validate bmp type
 	if(error == 0)
 	{
 		bmp2=read_bitmap(in_file_name2);
@@ -129,18 +115,17 @@ int main(int argc, char** argv)
 
 	if(error == 0)
 	{
-		//things look ok
-		//Visit Every Pixel
+		// Visit Every Pixel
 		int i;
 		int num_pixels = bmp->info->width * bmp->info->height;
 
 		for(i=0; i<num_pixels;i++)
 		{
-			//create a pixel pointer for first image
+			// Create a pixel pointer for first image
 			PIXEL* p;
 			p = (bmp->data+i);
 
-			//create a pixel pointer for second image
+			// Create a pixel pointer for second image
 			PIXEL* p2;
 			p2 = (bmp2->data+i);
 
@@ -159,17 +144,16 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				//do nothing
+				// Do nothing
 			}
 		}
-		//write the bmp to a file
 		write_bitmap(out_file_name, bmp);
 	}
 
 	return 0;
 }
 
-//-----FUNCTIONS----
+
 
 /**
 * loads a bitmap file into memory
@@ -179,11 +163,8 @@ int main(int argc, char** argv)
 BITMAP* read_bitmap(char* file)
 {
 	FILE *in_file = NULL;
-
-	//pointer for bitmap struct
 	BITMAP* bmp = malloc(sizeof(BITMAP));
 
-	//initialize bmp struct
 	bmp->header = malloc(sizeof(HEADER));
 	bmp->info = malloc(sizeof(INFO));
 	bmp->extra = NULL;
@@ -199,28 +180,17 @@ BITMAP* read_bitmap(char* file)
 	}
 	else
 	{
-		//file exists
-		//try reading the header and info header
 		fread(bmp->header, sizeof(HEADER), 1, in_file);
-
-		//
 		fread(bmp->info, sizeof(INFO), 1, in_file);
 	}
 
-	//File loaded and data is bitmap
 	if(error == 0)
 	{
-		//collect everything between the header/info and the img data
-		//color table, padding, etc
 		int size  = bmp->header->offset - sizeof(HEADER) - sizeof(INFO);
 		bmp->extra = malloc(size);
 		fread(bmp->extra, size, 1, in_file);
-
-		//collect the actual image data
 		bmp->data = malloc(bmp->info->img_size);
 		fread(bmp->data, bmp->info->img_size, 1, in_file);
-
-		//PRINT some bitmap info
 		puts("--------------");
 		puts("BITMAP INFO");
 		puts("--------------");
